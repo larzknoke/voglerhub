@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -8,204 +7,232 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Bill {
+model ActsAsBookableBooking {
+  id           Int       @id @default(autoincrement())
+  bookableId   Int?      @map("bookable_id")
+  bookableType String?   @map("bookable_type") @db.VarChar
+  bookerId     Int?      @map("booker_id")
+  bookerType   String?   @map("booker_type") @db.VarChar
+  amount       Int?
+  schedule     String?
+  timeStart    DateTime? @map("time_start") @db.Timestamp(6)
+  timeEnd      DateTime? @map("time_end") @db.Timestamp(6)
+  time         DateTime? @db.Timestamp(6)
+  bestaetigt   Boolean?
+  createdAt    DateTime? @map("created_at") @db.Timestamp(6)
+  typ          String?   @default("std") @db.VarChar
+  notiz        String?   @default("") @db.VarChar
+
+  @@index([bookableType, bookableId], map: "index_acts_as_bookable_bookings_bookable")
+  @@index([bookerType, bookerId], map: "index_acts_as_bookable_bookings_booker")
+  @@map("acts_as_bookable_bookings")
+}
+
+model Anfrage {
+  id        Int       @id @default(autoincrement())
+  name      String?   @db.VarChar
+  email     String?   @db.VarChar
+  telefon   String?   @db.VarChar
+  anzahl    Int?
+  antwort   String?
+  startDate DateTime? @map("startDate") @db.Timestamp(6)
+  endDate   DateTime? @map("endDate") @db.Timestamp(6)
+  createdAt DateTime  @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime  @map("updated_at") @db.Timestamp(6)
+  nachricht String?   @db.VarChar
+
+  @@map("anfrages")
+}
+
+model Brotbestellposi {
+  id               Int             @id @default(autoincrement())
+  menge            Int?
+  brotsorteId      Int?            @map("brotsorte_id")
+  brotbestellungId Int?            @map("brotbestellung_id")
+  createdAt        DateTime        @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime        @map("updated_at") @db.Timestamp(6)
+  brotsortes       Brotsorte?      @relation(fields: [brotsorteId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_1f8db7e58d")
+  brotbestellungs  Brotbestellung? @relation(fields: [brotbestellungId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_f72d498999")
+
+  @@index([brotbestellungId], map: "index_brotbestellposis_on_brotbestellung_id")
+  @@index([brotsorteId], map: "index_brotbestellposis_on_brotsorte_id")
+  @@map("brotbestellposis")
+}
+
+model Brotbestellschein {
+  id              Int              @id @default(autoincrement())
+  datum           DateTime?        @db.Timestamp(6)
+  versendet       DateTime?        @db.Timestamp(6)
+  createdAt       DateTime         @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime         @map("updated_at") @db.Timestamp(6)
+  brotbestellungs Brotbestellung[]
+
+  @@map("brotbestellscheins")
+}
+
+model Brotbestellung {
+  id                  Int                @id @default(autoincrement())
+  vorname             String?            @db.VarChar
+  name                String?            @db.VarChar
+  telefon             String?            @db.VarChar
+  email               String?            @db.VarChar
+  datum               DateTime?          @db.Timestamp(6)
+  typ                 String?            @default("bestellung") @db.VarChar
+  brotbestellscheinId Int?               @map("brotbestellschein_id")
+  createdAt           DateTime           @map("created_at") @db.Timestamp(6)
+  updatedAt           DateTime           @map("updated_at") @db.Timestamp(6)
+  brotbestellposis    Brotbestellposi[]
+  brotbestellscheins  Brotbestellschein? @relation(fields: [brotbestellscheinId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_bb19fd9523")
+
+  @@index([brotbestellscheinId], map: "index_brotbestellungs_on_brotbestellschein_id")
+  @@map("brotbestellungs")
+}
+
+model Brotsorte {
+  id                  Int               @id @default(autoincrement())
+  name                String?           @db.VarChar
+  aktiv               Boolean?
+  ausverkauft         Boolean?
+  brottypId           Int?              @map("brottyp_id")
+  createdAt           DateTime          @map("created_at") @db.Timestamp(6)
+  updatedAt           DateTime          @map("updated_at") @db.Timestamp(6)
+  brotbildFileName    String?           @map("brotbild_file_name") @db.VarChar
+  brotbildContentType String?           @map("brotbild_content_type") @db.VarChar
+  brotbildFileSize    Int?              @map("brotbild_file_size")
+  brotbildUpdatedAt   DateTime?         @map("brotbild_updated_at") @db.Timestamp(6)
+  brotbestellposis    Brotbestellposi[]
+  brottyps            Brottyp?          @relation(fields: [brottypId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_6926e9af57")
+
+  @@index([brottypId], map: "index_brotsortes_on_brottyp_id")
+  @@map("brotsortes")
+}
+
+model Brottyp {
   id         Int         @id @default(autoincrement())
-  trainerId  Int
-  teamId     Int
-  userId     String
-  iban       String?
-  quarter    Int
-  year       Int
-  hourlyRate Float?
-  totalCost  Float
-  status     String      @default("draft")
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  team       Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  trainer    Trainer     @relation(fields: [trainerId], references: [id], onDelete: Cascade)
-  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  events     BillEvent[]
+  name       String?     @db.VarChar
+  createdAt  DateTime    @map("created_at") @db.Timestamp(6)
+  updatedAt  DateTime    @map("updated_at") @db.Timestamp(6)
+  brotsortes Brotsorte[]
 
-  @@unique([trainerId, teamId, quarter, year])
+  @@map("brottyps")
 }
 
-model BillEvent {
-  id            Int      @id @default(autoincrement())
-  billId        Int
-  location      String
-  startDate     DateTime
-  endDate       DateTime
-  durationHours Float
-  hourlyRate    Float?
-  cost          Float
-  canceled      Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  bill          Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
+model Feed {
+  id           Int      @id @default(autoincrement())
+  title        String?  @db.VarChar
+  text         String?  @db.VarChar
+  priority     Int?
+  createdAt    DateTime @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime @map("updated_at") @db.Timestamp(6)
+  titleDetails String?  @map("title_details") @db.VarChar
+  text_details String?
+  deaktiviert  Boolean? @default(false)
+  vorschaubild Boolean? @default(false)
 
-  @@index([billId, startDate])
+  @@map("feeds")
 }
 
-model Player {
-  id          Int                  @id @default(autoincrement())
-  name        String
-  birthday    DateTime?
-  gender      String?
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
-  playerTeams PlayerTeamRelation[]
-}
-
-model PlayerTeamRelation {
+model Fewo {
   id        Int      @id @default(autoincrement())
-  playerId  Int
-  teamId    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  capacity  Int?
+  schedule  String?
+  mieterId  Int?     @map("mieter_id")
+  createdAt DateTime @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @map("updated_at") @db.Timestamp(6)
+  mieters   Mieter?  @relation(fields: [mieterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_59fa8c482b")
 
-  @@unique([playerId, teamId])
+  @@index([mieterId], map: "index_fewos_on_mieter_id")
+  @@map("fewos")
 }
 
-model Team {
-  id           Int                   @id @default(autoincrement())
-  name         String
-  createdAt    DateTime              @default(now())
-  updatedAt    DateTime              @updatedAt
-  bills        Bill[]
-  playerTeams  PlayerTeamRelation[]
-  trainerTeams TrainerTeamRelation[]
-
-  travelReports TravelReport[]
-}
-
-model Trainer {
-  id           Int                   @id @default(autoincrement())
-  name         String
-  createdAt    DateTime              @default(now())
-  updatedAt    DateTime              @updatedAt
-  stammverein  String?
-  licenseType  String?
-  Bill         Bill[]
-  trainerTeams TrainerTeamRelation[]
-
-  users User[]
-}
-
-model TrainerTeamRelation {
+model Mieter {
   id        Int      @id @default(autoincrement())
-  trainerId Int
-  teamId    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  trainer   Trainer  @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  name      String?  @db.VarChar
+  vorname   String?  @db.VarChar
+  telefon   String?  @db.VarChar
+  email     String?  @db.VarChar
+  strasse   String?  @db.VarChar
+  plz       Int?
+  ort       String?  @db.VarChar
+  createdAt DateTime @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @map("updated_at") @db.Timestamp(6)
+  notiz     String?  @default("") @db.VarChar
+  fewos     Fewo[]
 
-  @@unique([trainerId, teamId])
+  @@map("mieters")
+}
+
+model Openhour {
+  id           Int       @id @default(autoincrement())
+  tag          String?   @db.VarChar
+  start        DateTime? @db.Time(6)
+  ende         DateTime? @db.Time(6)
+  spezial      Boolean?
+  geschlossen  Boolean?
+  createdAt    DateTime  @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime  @map("updated_at") @db.Timestamp(6)
+  reihenfolge  Int?      @default(1)
+  without_time Boolean?  @default(false)
+
+  @@map("openhours")
+}
+
+model Setting {
+  id         Int       @id @default(autoincrement())
+  var        String    @db.VarChar
+  value      String?
+  thingId    Int?      @map("thing_id")
+  thingType  String?   @map("thing_type") @db.VarChar(30)
+  created_at DateTime? @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+
+  @@unique([thingType, thingId, var], name: "index_settings_on_thing_type_and_thing_id_and_var", map: "index_settings_on_thing_type_and_thing_id_and_var")
+  @@map("settings")
 }
 
 model User {
-  id            String         @id
-  name          String
-  email         String
-  emailVerified Boolean        @default(false)
-  image         String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  role          String?
-  banned        Boolean?       @default(false)
-  banReason     String?
-  banExpires    DateTime?
-  sessions      Session[]
-  accounts      Account[]
-  bills         Bill[]
-  trainerId     Int?
-  trainer       Trainer?       @relation(fields: [trainerId], references: [id], onDelete: SetNull)
-  travelReports TravelReport[]
+  id             Int      @id @default(autoincrement())
+  name           String?  @db.VarChar
+  email          String?  @db.VarChar
+  passwordDigest String?  @map("password_digest") @db.VarChar
+  createdAt      DateTime @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime @map("updated_at") @db.Timestamp(6)
 
-  @@unique([email])
-  @@map("user")
+  @@map("users")
 }
 
-model Session {
-  id             String   @id
-  expiresAt      DateTime
-  token          String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  ipAddress      String?
-  userAgent      String?
-  userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  impersonatedBy String?
+model active_storage_attachments {
+  id                   BigInt               @id @default(autoincrement())
+  name                 String               @db.VarChar
+  record_type          String               @db.VarChar
+  record_id            BigInt
+  blob_id              BigInt
+  created_at           DateTime             @db.Timestamp(6)
+  active_storage_blobs active_storage_blobs @relation(fields: [blob_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_c3b3935057")
 
-  @@unique([token])
-  @@index([userId])
-  @@map("session")
+  @@unique([record_type, record_id, name, blob_id], map: "index_active_storage_attachments_uniqueness")
+  @@index([blob_id], map: "index_active_storage_attachments_on_blob_id")
 }
 
-model Account {
-  id                    String    @id
-  accountId             String
-  providerId            String
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-
-  @@index([userId])
-  @@map("account")
+model active_storage_blobs {
+  id                         BigInt                       @id @default(autoincrement())
+  key                        String                       @unique(map: "index_active_storage_blobs_on_key") @db.VarChar
+  filename                   String                       @db.VarChar
+  content_type               String?                      @db.VarChar
+  metadata                   String?
+  byte_size                  BigInt
+  checksum                   String                       @db.VarChar
+  created_at                 DateTime                     @db.Timestamp(6)
+  active_storage_attachments active_storage_attachments[]
 }
 
-model Verification {
-  id         String   @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([identifier])
-  @@map("verification")
+model ar_internal_metadata {
+  key        String   @id @db.VarChar
+  value      String?  @db.VarChar
+  created_at DateTime @db.Timestamp(6)
+  updated_at DateTime @db.Timestamp(6)
 }
 
-model TravelReport {
-  id          Int       @id @default(autoincrement())
-  travelDate  DateTime
-  reason      String?
-  destination String
-  distance    Float
-  teamId      Int
-  userId      String
-  totalCost   Float
-  status      String    @default("unpaid")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  vehicles    Vehicle[]
-
-  @@index([teamId, travelDate])
-}
-
-model Vehicle {
-  id             Int          @id @default(autoincrement())
-  travelReportId Int
-  driver         String?
-  distance       Float
-  cost           Float
-  noCharge       Boolean      @default(false)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  travelReport   TravelReport @relation(fields: [travelReportId], references: [id], onDelete: Cascade)
-
-  @@index([travelReportId])
+model schema_migrations {
+  version String @unique(map: "unique_schema_migrations") @db.VarChar
 }
