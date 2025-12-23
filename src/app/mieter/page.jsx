@@ -18,7 +18,7 @@ async function Mieter() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Mieters" />
+      <PageHeader title="Mieter" />
       <ul>
         {mieters.map((m) => (
           <li key={m.id}>

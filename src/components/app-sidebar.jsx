@@ -6,13 +6,13 @@ import {
   Users,
   Search,
   Settings,
-  Volleyball,
   UserStar,
   FileSpreadsheet,
   CakeSlice,
   User,
   UserCog,
   Car,
+  Tractor,
 } from "lucide-react";
 
 import {
@@ -57,6 +57,11 @@ const items = [
   {
     title: "Teams",
     url: "/team",
+    icon: Users,
+  },
+  {
+    title: "Mieter",
+    url: "/mieter",
     icon: Users,
   },
   {
@@ -120,8 +125,8 @@ export function AppSidebar() {
             >
               <a href="/">
                 {/* <IconInnerShadowTop className="!size-5" /> */}
-                <Volleyball />
-                <span className="text-base font-semibold">voglerhub</span>
+                <Tractor />
+                <span className="text-base font-semibold">Voglerhub</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

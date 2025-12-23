@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Volleyball } from "lucide-react";
+import { Tractor } from "lucide-react";
 import Link from "next/link";
 
 export default function SignUpPage() {
@@ -86,7 +86,7 @@ export default function SignUpPage() {
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-center">
-              <Volleyball className="h-12 w-12 text-primary" />
+              <Tractor className="h-12 w-12 text-primary" />
             </div>
             <CardTitle className="text-2xl text-center">
               E-Mail-Verifizierung
@@ -128,7 +128,7 @@ export default function SignUpPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center">
-            <Volleyball className="h-12 w-12 text-primary" />
+            <Tractor className="h-12 w-12 text-primary" />
           </div>
           <CardTitle className="text-2xl text-center">
             Konto erstellen

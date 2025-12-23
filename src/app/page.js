@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
-import { Volleyball } from "lucide-react";
+import { Tractor } from "lucide-react";
 import Link from "next/link";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -23,7 +23,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin">
-          <Volleyball className="h-12 w-12 text-primary" />
+          <Tractor className="h-12 w-12 text-primary" />
         </div>
       </div>
     );
@@ -34,9 +34,9 @@ export default function Home() {
       <main className="flex flex-col gap-[32px] row-start-2 items-center">
         <SidebarTrigger className="absolute top-6 right-6 md:hidden" />
         <div className="flex items-center justify-center">
-          <Volleyball className="h-16 w-16 text-primary" />
+          <Tractor className="h-16 w-16 text-primary" />
         </div>
-        voglerhub | HSG-Solling ©2025
+        Voglerhub | Voglerhof ©2025
         {!session && (
           <div className="flex gap-4 mt-4">
             <Button asChild size="lg">
@@ -51,22 +51,7 @@ export default function Home() {
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://hvnb-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/clubInfoDisplay?club=132538"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          NU-LIGA
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://www.hsg-solling-handball.de"
+          href="https://www.voglerhof.de"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -77,7 +62,7 @@ export default function Home() {
             width={16}
             height={16}
           />
-          HSG-SOLLING-HANDBALL.DE
+          VOGLERHOF.DE
         </a>
       </footer>
     </div>

@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Volleyball, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { Tractor, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 function VerifyEmailContent() {
